@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Button,
   FlatList,
@@ -11,27 +11,37 @@ import {
 import IconButton from "../Components/IconButton";
 import List from "../Components/List";
 import { MEALS } from "../data/dummyData";
+import { FavouriteContext } from "../store/context/favourites-context";
 export default function MealsCompleteDetails({ route, navigation }) {
   const { mealId } = route.params;
+
+  const { ids, addFavourite, removeFavourite } = useContext(FavouriteContext);
+
+  const mealIsFavourite = ids.includes(mealId);
+
+  function changeFavouriteStatusHandler() {
+    if (mealIsFavourite) {
+      removeFavourite(mealId);
+    } else {
+      addFavourite(mealId);
+    }
+  }
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       title,
-      headerRight: () => {
+      headerRight: ({ color, size }) => {
         return (
           <IconButton
-            pressHandler={handleButtonPress}
-            icon="star"
+            pressHandler={changeFavouriteStatusHandler}
+            icon={mealIsFavourite ? "star" : "star-outline"}
             color="white"
+            size={size}
           />
         );
       },
     });
-  }, [title, navigation]);
-
-  const handleButtonPress = () => {
-    console.log("Button Pressed");
-  };
+  }, [title, navigation, changeFavouriteStatusHandler]);
 
   const {
     title,
