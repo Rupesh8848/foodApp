@@ -8,11 +8,19 @@ import {
   Text,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import IconButton from "../Components/IconButton";
 import List from "../Components/List";
 import { MEALS } from "../data/dummyData";
+import { addFavourite, removeFavourite } from "../slices/FavouritesSlice";
 export default function MealsCompleteDetails({ route, navigation }) {
   const { mealId } = route.params;
+
+  const dispatch = useDispatch();
+  const { ids } = useSelector((state) => state.favourite);
+
+  const isFavourite = ids.includes(mealId);
+  console.log(isFavourite);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -21,16 +29,20 @@ export default function MealsCompleteDetails({ route, navigation }) {
         return (
           <IconButton
             pressHandler={handleButtonPress}
-            icon="star"
+            icon={isFavourite ? "star" : "star-outline"}
             color="white"
           />
         );
       },
     });
-  }, [title, navigation]);
+  }, [title, navigation, isFavourite]);
 
   const handleButtonPress = () => {
-    console.log("Button Pressed");
+    if (isFavourite) {
+      dispatch(removeFavourite({ id: mealId }));
+    } else {
+      dispatch(addFavourite({ id: mealId }));
+    }
   };
 
   const {
